@@ -182,7 +182,8 @@ $.getJSON("http://tweep.in/ip_location.php", function(json){
       var geoJsonLayer = L.geoJson(geojsonFeature, {
         
         pointToLayer: function (feature, latlng) {
-				marker = new L.marker(latlng);
+				marker = new L.marker(latlng, {
+        riseOnHover:true });
 				return marker;
         }
         ,
