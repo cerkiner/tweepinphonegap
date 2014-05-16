@@ -60,7 +60,9 @@
       var pinswehave = [];
 
       var map = L.map('map', {
-        zoomControl:false }
+        zoomControl:false, 
+        minZoom:14, 
+        maxZoom:18 }
                      );
       
       
@@ -79,7 +81,7 @@
   here = e.latlng;
   
   if(hereMarker == 0 || hereCircle == 0){
-    map.setView(here, 16);
+    map.setView(here, 18);
 	$( "#splash" ).delay( 500 ).hide( "shake", 500 );
 }
   if(hereMarker == 0){
@@ -96,7 +98,9 @@
   else{
 	hereCircle.setLatLng(here);
 }
+map.setMaxBounds([[here['lat']-0.1, here['lng']-0.1], [here['lat']+0.1, here['lng']+0.1]]);
 }
+
   
   map.on('locationfound', onLocationFound);
   
