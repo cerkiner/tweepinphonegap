@@ -1,0 +1,206 @@
+<html>
+  <head>  
+  <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<link rel="shortcut icon" href="/imgs/favicons/favicon.ico">
+	<link rel="icon" sizes="16x16 32x32 64x64" href="/imgs/favicons/favicon.ico">
+	<link rel="icon" type="image/png" sizes="196x196" href="/imgs/favicons/favicon-196.png">
+	<link rel="icon" type="image/png" sizes="160x160" href="/imgs/favicons/favicon-160.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="/imgs/favicons/favicon-96.png">
+	<link rel="icon" type="image/png" sizes="64x64" href="/imgs/favicons/favicon-64.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/imgs/favicons/favicon-32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/imgs/favicons/favicon-16.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/imgs/favicons/favicon-152.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/imgs/favicons/favicon-144.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/imgs/favicons/favicon-120.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/imgs/favicons/favicon-114.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/imgs/favicons/favicon-76.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/imgs/favicons/favicon-72.png">
+	<link rel="apple-touch-icon" href="/imgs/favicons/favicon-57.png">
+	<meta name="msapplication-TileColor" content="#FFFFFF">
+	<meta name="msapplication-TileImage" content="/imgs/favicons/favicon-144.png">
+	<meta name="msapplication-config" content="/imgs/favicons/browserconfig.xml">
+
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css">
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js">
+  </script>
+  <style type="text/css">
+  </style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+ <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+  <script src="http://malsup.github.com/jquery.form.js">
+  </script>
+  
+  <link rel="stylesheet" href="css/style.css">
+
+<title>tweep.in</title>
+  </head>
+  <body>
+  
+    <div id="splash">
+    </div>
+	
+    <div id="map">
+    </div>
+    
+    <script>
+      var here;
+      var hereMarker = 0;
+      var hereCircle = 0;
+      var radius;
+      var getpinsbusy = 0;
+      var popupbusy = 0;
+	  var geoJsonLayer;
+	  var newpinpopup = L.popup();
+	  var newpinpopupr;
+      var pinswehave = [];
+
+      var map = L.map('map', {
+        zoomControl:false }
+                     );
+      
+      
+      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+		attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
+	}
+               ).addTo(map);
+  
+
+  map.locate({
+    watch: true, enableHighAccuracy: true, timeout: 20000, maximumAge: 20000}
+            );
+  
+  function onLocationFound(e) {
+    radius = 30 + e.accuracy/2;
+  here = e.latlng;
+  
+  if(hereMarker == 0 || hereCircle == 0){
+    map.setView(here, 16);
+	$( "#splash" ).delay( 500 ).hide( "shake", 500 );
+}
+  if(hereMarker == 0){
+
+    hereMarker = L.marker(here).addTo(map)
+      .bindPopup("You").openPopup();
+}
+  else{
+	hereMarker.setLatLng(here);
+}
+  if(hereCircle == 0 && radius < 200){
+    hereCircle = L.circle(here, radius).addTo(map);
+}
+  else{
+	hereCircle.setLatLng(here);
+}
+}
+  
+  map.on('locationfound', onLocationFound);
+  
+  function onLocationError(e) {
+    
+    radius = 30;
+	var here;
+$.getJSON("http://tweep.in/ip_location.php", function(json){
+    here = $.parseJSON(json);
+    map.setView(here, 16);
+});
+    
+	$( "#splash" ).delay( 3000 ).hide( "shake",1500 );
+}
+  
+  map.on('locationerror', onLocationError);
+  
+  
+  
+  function onMapClick(e) {
+    
+	if(e.latlng.distanceTo(here)<radius && radius < 200) {
+      newpinpopup
+        .setLatLng(e.latlng)
+        .setContent("<form id=\"newpin\" action=\"http://tweep.in/process_pin.php\" method=\"post\">     <input type=\"text\" name=\"text\" maxlength=\"100\" placeholder=\"Tweet you want to pin.\" class=\"ui-corner-all ui-button-text-only ui-button-text ui-widget\"/> 	<input type=\"hidden\" name=\"process\" value=\"add\"/>     <input type=\"hidden\" name=\"latitude\" value=\"" + e.latlng['lat'].toString() + "\"/>     <input type=\"hidden\" name=\"longitude\" value=\"" + e.latlng['lng'].toString() + "\"/>   <input type=\"submit\" class=\"formBtn\" value=\"Pin\" style=\"position: absolute; left: -9999px; width: 1px; height: 1px;\"/> </form>")
+        .openOn(map);
+      $('#newpin').ajaxForm({
+        
+        dataType:  'json', 
+        success:   processJson 
+      }
+                           );
+						   
+    $( ".formBtn" ).button();
+
+	
+      
+      function processJson(data) {
+        
+        if  (!data.error) {
+						marker = new L.marker(e.latlng).addTo(map)
+						.bindPopup(data.text).openPopup().closePopup();
+						getPins();
+        }
+      }
+    }
+	}
+  
+  map.on('click', onMapClick);
+  
+  
+  
+  
+  function getPins() {
+  if(!getpinsbusy){
+  getpinsbusy = 1;
+    west = map.getBounds().getWest();
+    east = map.getBounds().getEast();
+    south = map.getBounds().getSouth();
+    north = map.getBounds().getNorth();
+    $.ajax({
+      url: "http://tweep.in/pins.php?west="+west+"&east="+east+"&south="+south+"&north="+north+"&pinswehave="+pinswehave,
+      dataType: 'json',
+      success: function(geojsonFeature){
+        
+        
+		function onEachFeature(feature, layer) {
+          if (feature.properties && feature.properties.popupContent) {
+            layer.bindPopup(feature.properties.popupContent, {
+            showOnMouseOver: true,
+			maxWidth:800
+        });
+            pinswehave.push(feature.id);
+          }
+		}
+      
+      
+      
+      var geoJsonLayer = L.geoJson(geojsonFeature, {
+        
+        pointToLayer: function (feature, latlng) {
+				marker = new L.marker(latlng);
+				return marker;
+        }
+        ,
+        
+        onEachFeature: onEachFeature
+      }
+                                  ).addTo(map);
+      
+      
+    }
+}
+      );
+getpinsbusy = 0;
+	  }
+}
+  map.on( "viewreset", getPins);
+  map.on( "moveend", getPins);
+  map.on( "zoomend", getPins);
+  map.on( "dragend", getPins);
+  map.on( "resize", getPins);
+  
+
+  </script>
+  </body>
+</html>
