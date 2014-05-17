@@ -48,6 +48,19 @@
     </div>
     
     <script>
+	//splash
+	// set interval
+var tid = setInterval(mycode, 2000);
+function mycode() {
+
+	$( "#splash" ).effect( "shake" );
+}
+function abortTimer() { // to be called when you want to stop the timer
+  clearInterval(tid);
+}
+	
+	
+	
       var here;
       var hereMarker = 0;
       var hereCircle = 0;
@@ -112,8 +125,8 @@ $.getJSON("http://tweep.in/ip_location.php", function(json){
     here = $.parseJSON(json);
     map.setView(here, 16);
 });
-    
-	$( "#splash" ).delay( 3000 ).hide( "shake",1500 );
+    abortTimer();
+	$( "#splash" ).delay( 1000 ).hide( "slide","up" );
 }
   
   map.on('locationerror', onLocationError);
@@ -171,7 +184,7 @@ $.getJSON("http://tweep.in/ip_location.php", function(json){
           if (feature.properties && feature.properties.popupContent) {
             layer.bindPopup(feature.properties.popupContent, {
             showOnMouseOver: true,
-			maxWidth:360
+			maxWidth:300
         });
             pinswehave.push(feature.id);
           }

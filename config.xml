@@ -53,12 +53,12 @@
     <!-- Define app icon for each platform. -->
 	<icon src="imgs/favicons/favicon-96.png" width="96" height="96"/>
 	
-    <!-- Define app splash screen for each platform. -->
+    <!-- Define app splash screen for each platform.
     <gap:splash src="imgs/screen/android/screen-ldpi-portrait.png"       gap:platform="android" gap:qualifier="port-ldpi" />
     <gap:splash src="imgs/screen/android/screen-mdpi-portrait.png"       gap:platform="android" gap:qualifier="port-mdpi" />
     <gap:splash src="imgs/screen/android/screen-hdpi-portrait.png"       gap:platform="android" gap:qualifier="port-hdpi" />
     <gap:splash src="imgs/screen/android/screen-xhdpi-portrait.png"      gap:platform="android" gap:qualifier="port-xhdpi" />
-	
+	 -->
 	
     <access origin="http://*.tweep.in/" />
     <access origin="http://tweep.in/*" />
