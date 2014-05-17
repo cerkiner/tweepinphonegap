@@ -171,7 +171,7 @@ $.getJSON("http://tweep.in/ip_location.php", function(json){
           if (feature.properties && feature.properties.popupContent) {
             layer.bindPopup(feature.properties.popupContent, {
             showOnMouseOver: true,
-			maxWidth:800
+			maxWidth:360
         });
             pinswehave.push(feature.id);
           }
