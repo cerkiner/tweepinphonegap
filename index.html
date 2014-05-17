@@ -50,15 +50,11 @@
     <script>
 	//splash
 	// set interval
-var tid = setInterval(mycode, 2000);
+var tid = setInterval(mycode, 1500);
 function mycode() {
 
 	$( "#splash" ).effect( "shake" );
 }
-function abortTimer() { // to be called when you want to stop the timer
-  clearInterval(tid);
-}
-	
 	
 	
       var here;
@@ -95,7 +91,8 @@ function abortTimer() { // to be called when you want to stop the timer
   
   if(hereMarker == 0 || hereCircle == 0){
     map.setView(here, 18);
-	$( "#splash" ).delay( 500 ).hide( "shake", 500 );
+    clearInterval(tid);
+	$( "#splash" ).delay( 1000 ).hide( "puff" );
 }
   if(hereMarker == 0){
 
@@ -125,8 +122,8 @@ $.getJSON("http://tweep.in/ip_location.php", function(json){
     here = $.parseJSON(json);
     map.setView(here, 16);
 });
-    abortTimer();
-	$( "#splash" ).delay( 1000 ).hide( "slide","up" );
+    clearInterval(tid);
+	$( "#splash" ).delay( 1000 ).hide( "puff" );
 }
   
   map.on('locationerror', onLocationError);
